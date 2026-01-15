@@ -1,0 +1,7 @@
+
+taskapp_user
+
+4re6BR8Ci3xNBfOw
+
+
+mongodb+srv://taskapp_user:4re6BR8Ci3xNBfOw@cluster0.824rxpi.mongodb.net/?appName=Cluster0
