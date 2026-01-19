@@ -5,3 +5,8 @@ taskapp_user
 
 
 mongodb+srv://taskapp_user:4re6BR8Ci3xNBfOw@cluster0.824rxpi.mongodb.net/?appName=Cluster0
+
+MONGODB_URI=mongodb+srv://taskapp_user:4re6BR8Ci3xNBfOw@cluster0.824rxpi.mongodb.net/?appName=Cluster0
+
+
+MONGODB_URI=mongodb+srv://arpanmahato_db_user:4re6BR8Ci3xNBfOw@cluster0.4ufooao.mongodb.net/?retryWrites=true&w=majority
