@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private usersService: UsersService) {}
 
   @Get()
   async getAllUsers() {
@@ -13,7 +13,7 @@ export class UsersController {
   }
 
   @Get('me')
-  async getProfile(@Request() req: any) {
+  async getProfile(@Request() req) {
     return this.usersService.findById(req.user.userId);
   }
 }

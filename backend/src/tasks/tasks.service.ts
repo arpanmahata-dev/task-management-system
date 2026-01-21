@@ -7,19 +7,23 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
-  constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
+  constructor(
+    @InjectModel(Task.name) private taskModel: Model<TaskDocument>,
+  ) {}
 
   async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
-  const newTask = new this.taskModel({
-    ...createTaskDto,
-    createdBy: userId,
-    assignedTo: createTaskDto.assignedTo || userId,
-    status: createTaskDto.status || 'pending',
-    priority: createTaskDto.priority || 'medium'
-  });
-  
-  return await newTask.save();
-}
+    const newTask = new this.taskModel({
+      title: createTaskDto.title,
+      description: createTaskDto.description,
+      dueDate: createTaskDto.dueDate,
+      priority: createTaskDto.priority,
+      status: 'todo',
+      createdBy: userId,
+      assignedTo: createTaskDto.assignedTo || userId,
+    });
+    return newTask.save();
+  }
+
   async findAll(userId: string): Promise<Task[]> {
     return this.taskModel
       .find({
@@ -53,9 +57,11 @@ export class TasksService {
     const now = new Date();
     return this.taskModel
       .find({
-        $or: [{ createdBy: userId }, { assignedTo: userId }],
-        dueDate: { $lt: now },
-        status: { $ne: 'completed' },
+        $and: [
+          { $or: [{ createdBy: userId }, { assignedTo: userId }] },
+          { dueDate: { $lt: now } },
+          { status: { $ne: 'completed' } },
+        ],
       })
       .populate('createdBy', 'name email')
       .populate('assignedTo', 'name email')
@@ -83,7 +89,6 @@ export class TasksService {
       throw new NotFoundException('Task not found');
     }
 
-    // Only creator or assignee can update
     if (task.createdBy.toString() !== userId && task.assignedTo?.toString() !== userId) {
       throw new ForbiddenException('You do not have permission to update this task');
     }
@@ -99,7 +104,6 @@ export class TasksService {
       throw new NotFoundException('Task not found');
     }
 
-    // Only creator can delete
     if (task.createdBy.toString() !== userId) {
       throw new ForbiddenException('You do not have permission to delete this task');
     }
@@ -110,10 +114,12 @@ export class TasksService {
   async search(query: string, userId: string): Promise<Task[]> {
     return this.taskModel
       .find({
-        $or: [{ createdBy: userId }, { assignedTo: userId }],
-        $or: [
-          { title: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } },
+        $and: [
+          { $or: [{ createdBy: userId }, { assignedTo: userId }] },
+          { $or: [
+            { title: { $regex: query, $options: 'i' } },
+            { description: { $regex: query, $options: 'i' } },
+          ]},
         ],
       })
       .populate('createdBy', 'name email')
