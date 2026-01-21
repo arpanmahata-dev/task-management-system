@@ -9,7 +9,6 @@ export const api = axios.create({
   },
 });
 
-// Add token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -18,7 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auth API
 export const authAPI = {
   register: (data: { email: string; password: string; name: string }) =>
     api.post('/auth/register', data),
@@ -27,11 +25,20 @@ export const authAPI = {
   getProfile: () => api.get('/auth/me'),
 };
 
-// Tasks API (we'll add this later)
 export const tasksAPI = {
   getAll: () => api.get('/tasks'),
+  getMyTasks: () => api.get('/tasks/my-tasks'),
+  getCreatedByMe: () => api.get('/tasks/created-by-me'),
+  getOverdue: () => api.get('/tasks/overdue'),
+  getStatistics: () => api.get('/tasks/statistics'),
+  search: (query: string) => api.get(`/tasks/search?q=${query}`),
   getById: (id: string) => api.get(`/tasks/${id}`),
   create: (data: any) => api.post('/tasks', data),
   update: (id: string, data: any) => api.patch(`/tasks/${id}`, data),
   delete: (id: string) => api.delete(`/tasks/${id}`),
+};
+
+export const usersAPI = {
+  getAll: () => api.get('/users'),
+  getProfile: () => api.get('/users/me'),
 };
