@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -83,19 +84,33 @@ export class TasksService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto, userId: string): Promise<Task> {
-    const task = await this.taskModel.findById(id);
-    
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
-
-    if (task.createdBy.toString() !== userId && task.assignedTo?.toString() !== userId) {
-      throw new ForbiddenException('You do not have permission to update this task');
-    }
-
-    Object.assign(task, updateTaskDto);
-    return task.save();
+  const task = await this.taskModel.findById(id).exec();
+  
+  if (!task) {
+    throw new NotFoundException('Task not found');
   }
+
+  // Check permissions - convert ObjectId to string safely
+  const createdById = task.createdBy.toString();
+  const assignedToId = task.assignedTo?.toString();
+
+  if (createdById !== userId && assignedToId !== userId) {
+    throw new ForbiddenException('You do not have permission to update this task');
+  }
+
+  // Update the task
+  const updatedTask = await this.taskModel
+    .findByIdAndUpdate(id, updateTaskDto, { new: true })
+    .populate('createdBy', 'name email')
+    .populate('assignedTo', 'name email')
+    .exec();
+
+  if (!updatedTask) {
+    throw new NotFoundException('Task not found');
+  }
+
+  return updatedTask;
+}
 
   async delete(id: string, userId: string): Promise<void> {
     const task = await this.taskModel.findById(id);

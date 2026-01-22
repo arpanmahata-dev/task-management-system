@@ -76,14 +76,18 @@ export default function TaskCard({ task, onDelete, onEdit, onStatusChange }: Tas
       </div>
 
       <select
-        value={task.status}
-        onChange={(e) => onStatusChange(task._id, e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+      value={task.status}
+      onChange={(e) => {
+        e.preventDefault();
+        onStatusChange(task._id, e.target.value);
+      }}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+      onClick={(e) => e.stopPropagation()}
       >
-        <option value="todo">To Do</option>
-        <option value="in-progress">In Progress</option>
-        <option value="completed">Completed</option>
-      </select>
+      <option value="todo">To Do</option>
+      <option value="in-progress">In Progress</option>
+      <option value="completed">Completed</option>
+    </select>
     </div>
   );
 }
